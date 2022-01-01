@@ -1,6 +1,6 @@
 class Weather {
   String? cityName;
-  String? temp;
+  double? temp;
   double? wind;
   int? humidity;
   // ignore: non_constant_identifier_names
