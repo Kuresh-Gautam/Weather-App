@@ -21,11 +21,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   WeatherApiClient client = WeatherApiClient();
-  Weather? data;
 
-  Future<void> getData() async {
+  Future<Weather?> getData() async {
     LocationData locationData = await getLocation();
-    data = await client.getWeatherFromGps(locationData);
+
+    listOfCities(locationData, 10);
+    return await client.getWeatherFromGps(locationData);
   }
 
   @override
@@ -59,12 +60,19 @@ class _HomePageState extends State<HomePage> {
             child: const Icon(
               Icons.location_on,
             ),
-            onPressed: () {},
+            onPressed: () async {
+              setState(() {});
+            },
           ),
           body: FutureBuilder(
             future: getData(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text(snapshot.error.toString());
+                }
+                Weather? data = (snapshot.data as Weather);
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 10,
@@ -74,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       currentWeatherWidget(
-                          Icons.wb_sunny, "${data!.temp}", "${data!.cityName}"),
+                          Icons.wb_sunny, "${data.temp}", "${data.cityName}"),
                       const SizedBox(
                         height: 20,
                       ),
@@ -91,8 +99,8 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.green,
                       ),
                       //Now lets create additional information weidget
-                      additionalInfoWidget("${data!.wind}", "${data!.pressure}",
-                          "${data!.humidity}", "${data!.feels_like}"),
+                      additionalInfoWidget("${data.wind}", "${data.pressure}",
+                          "${data.humidity}", "${data.feels_like}"),
 
                       //Now we have the UI ready
                       // Start git repository
@@ -100,10 +108,9 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 );
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return (const CircularProgressIndicator());
+              } else {
+                return const Center(child: CircularProgressIndicator());
               }
-              return Container();
             },
           )),
     );

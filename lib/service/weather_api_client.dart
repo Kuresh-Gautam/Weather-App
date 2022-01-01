@@ -18,7 +18,7 @@ class WeatherApiClient {
 
   Future<Weather>? getWeatherFromGps(LocationData locationData) async {
     var endPoint = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?lat=${locationData.latitude}&lon=${locationData.longitude}&appid=appid=acfa9cdc4e00af3a79040e1e1ef02ae5&units=metric',
+      'https://api.openweathermap.org/data/2.5/weather?lat=${locationData.latitude}&lon=${locationData.longitude}&appid=acfa9cdc4e00af3a79040e1e1ef02ae5&units=metric',
     );
     var respond = await http.get(endPoint);
     var body = jsonDecode(respond.body);
