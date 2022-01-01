@@ -1,5 +1,9 @@
+import 'package:location/location.dart';
+import 'package:weather_app/service/location_service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:weather_app/model/weather_model.dart';
+
 import 'package:weather_app/service/weather_api_client.dart';
 import 'package:weather_app/widgets/additional_info_widget.dart';
 import 'package:weather_app/widgets/current_weather_widget.dart';
@@ -20,7 +24,8 @@ class _HomePageState extends State<HomePage> {
   Weather? data;
 
   Future<void> getData() async {
-    data = await client.getLocation('Kathmandu');
+    LocationData locationData = await getLocation();
+    data = await client.getWeatherFromGps(locationData);
   }
 
   @override
