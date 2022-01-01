@@ -3,6 +3,7 @@ class Weather {
   String? temp;
   double? wind;
   int? humidity;
+  // ignore: non_constant_identifier_names
   double? feels_like;
   int? pressure;
 
@@ -11,6 +12,7 @@ class Weather {
     required this.temp,
     required this.wind,
     required this.humidity,
+    // ignore: non_constant_identifier_names
     required this.feels_like,
     required this.pressure,
   });
