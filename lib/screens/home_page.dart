@@ -24,9 +24,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<Weather?> getData() async {
     LocationData locationData = await getLocation();
-
-    listOfCities(locationData, 10);
     return await client.getWeatherFromGps(locationData);
+  }
+
+  Future<List<String>> getListOfCities(int count) async {
+    LocationData locationData = await getLocation();
+    List<String> listOfCitys = await listOfCities(locationData, count);
+    return listOfCitys;
   }
 
   @override
@@ -64,54 +68,74 @@ class _HomePageState extends State<HomePage> {
               setState(() {});
             },
           ),
-          body: FutureBuilder(
-            future: getData(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return Text(snapshot.error.toString());
-                }
-                Weather? data = (snapshot.data as Weather);
+          body: Column(
+            children: [
+              FutureBuilder(
+                future: getListOfCities(10),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    }
+                    return Text(snapshot.data);
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+              FutureBuilder(
+                future: getData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    }
+                    Weather? data = (snapshot.data as Weather);
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      currentWeatherWidget(
-                          Icons.wb_sunny, "${data.temp}", "${data.cityName}"),
-                      const SizedBox(
-                        height: 20,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
                       ),
-                      const Text(
-                        'Additional Information',
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Divider(
-                        thickness: 1,
-                        color: Colors.green,
-                      ),
-                      //Now lets create additional information weidget
-                      additionalInfoWidget("${data.wind}", "${data.pressure}",
-                          "${data.humidity}", "${data.feels_like}"),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          currentWeatherWidget(Icons.wb_sunny, "${data.temp}",
+                              "${data.cityName}"),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const Text(
+                            'Additional Information',
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Divider(
+                            thickness: 1,
+                            color: Colors.green,
+                          ),
+                          //Now lets create additional information weidget
+                          additionalInfoWidget(
+                              "${data.wind}",
+                              "${data.pressure}",
+                              "${data.humidity}",
+                              "${data.feels_like}"),
 
-                      //Now we have the UI ready
-                      // Start git repository
-                      //after that API fetch
-                    ],
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
+                          //Now we have the UI ready
+                          // Start git repository
+                          //after that API fetch
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ],
           )),
     );
   }
