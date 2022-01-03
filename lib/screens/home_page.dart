@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   WeatherApiClient client = WeatherApiClient();
 
   Future<Weather?> getData() async {
@@ -32,6 +33,9 @@ class _HomePageState extends State<HomePage> {
     List<String> listOfCitys = await listOfCities(locationData, count);
     return listOfCitys;
   }
+
+  String city = 'Kathmandu';
+  int numberOfCities = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -70,21 +74,62 @@ class _HomePageState extends State<HomePage> {
           ),
           body: Column(
             children: [
+              Form(
+                key: formKey,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          label: Text("Enter city no"),
+                        ),
+                        onSaved: (newValue) {
+                          setState(() => numberOfCities =
+                              newValue == null ? 10 : int.parse(newValue));
+                        },
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          formKey.currentState?.save();
+                        }
+                        
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ),
               FutureBuilder(
-                future: getListOfCities(10),
+                future: getListOfCities(numberOfCities),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasError) {
                       return Text(snapshot.error.toString());
                     }
-                    return Text(snapshot.data);
+                    List<String> cityList = (snapshot.data) as List<String>;
+                    return DropdownButton(
+                      onChanged: (value) {
+                        setState(() {
+                          city = value.toString();
+                        });
+                      },
+                      items: cityList.map<DropdownMenuItem<String>>((city) {
+                        return DropdownMenuItem<String>(
+                          child: Text(city),
+                          value: city,
+                        );
+                      }).toList(),
+                    );
                   } else {
                     return const Center(child: CircularProgressIndicator());
                   }
                 },
               ),
               FutureBuilder(
-                future: getData(),
+                future: client.getWeatherFromCity(city),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasError) {

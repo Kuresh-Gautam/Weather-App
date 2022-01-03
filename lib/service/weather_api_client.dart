@@ -5,9 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:weather_app/model/weather_model.dart';
 
 class WeatherApiClient {
-  Future<Weather>? getWeatherFromLocation(String? location) async {
+  Future<Weather>? getWeatherFromCity(String city) async {
     var endPoint = Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?q=$location&appid=acfa9cdc4e00af3a79040e1e1ef02ae5&units=metric',
+      'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=acfa9cdc4e00af3a79040e1e1ef02ae5&units=metric',
     );
     var respond = await http.get(endPoint);
     var body = jsonDecode(respond.body);
